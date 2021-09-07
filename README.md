@@ -1,4 +1,4 @@
-# OS-Simulator
+# OS_Simulator
 A web application to simulate many well known OS processes along with a user-friendly UI
 
 HOW TO RUN IT   
