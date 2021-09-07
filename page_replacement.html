@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../os_concepts/page_replacement/my_css.css">
+    <script src="../os_concepts/page_replacement/FIFO.js"></script>
+    <script src="../os_concepts/page_replacement/LFU.js"></script>
+    <script src="../os_concepts/page_replacement/LRU.js"></script>
+    <script src="../os_concepts/page_replacement/Optimal.js"></script>
+    <script src="../os_concepts/page_replacement/SC.js"></script>
+    <script src="../os_concepts/page_replacement/my_js.js"></script>
+    <title>Page Replacement Algorithm Simulation</title>
+</head>
+
+<body>
+    <div class="w3-container" id="V">
+        <h1 class="w3-xxlarge w3-center">Simulation of Page Replacement<span class="w3-right w3-button w3-medium w3-orange w3-margin" onclick="location.reload()">Clear ALL</span></h1>
+        <div class="w3-row">
+            <div class="w3-col l6 w3-padding">
+                <form @submit.prevent>
+                    <select name="" id="" class="w3-select w3-margin" style="width:50%" v-model="algo">
+                        <option class="w3-center" value="FIFO">FIFO</option>
+                        <option class="w3-center" value="LRU">Least Recently Used</option>
+                        <option class="w3-center" value="LFU">Least Frequently Used</option>
+                        <option class="w3-center" value="OPT">Optimal</option>
+                        <!--option class="w3-center" value="SC">Second Chance</option-->
+                    </select>
+
+                    <input type="number" name="" id="" placeholder="Frame Size" class="w3-input w3-margin" style="width:50%" @change="createArr" v-model="size">
+
+                    <!--<input type="number" name="" id="" placeholder="Max Page Number" :disabled="dis" class="w3-input w3-margin" style="width:50%" v-model="max" @change="check()">-->
+
+                    <label class="w3-margin" style="margin-top:32px!important;display:block">Enter the Page Reference String Below(press SPACE to move to next entry)</label>
+
+                    <table class="w3-margin w3-responsive">
+                        <tr>
+                            <td v-for="(input,index) in inputs" class="w3-padding">
+                                {{input}}
+                            </td>
+                            <td>
+                                <p>
+                                    <input class="w3-input" type="number" @keyup.space="addIpts" @keyup.right="addIpts" @keyup.esc="value =''" v-model="value" style="width:80px;" min="0" :disabled="inpDis||show">
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <button class="w3-button w3-green w3-margin" @click="done" :disabled="disSub||show">Compute!</button>
+                </form>
+            </div>
+            <div class="w3-col l6 w3-border w3-padding-32" style="margin-bottom: 30px">
+                <p class="w3-xlarge w3-center">Current Reference String</p>
+                <div style="width:90vw;"></div>
+                <span class="w3-margin" v-for="input in inputs" v-text="input" style="display:inline-block"></span>
+            </div>
+            <div class="w3-row w3-center w3-container w3-margin" v-if="show">
+                <div class="w3-responsive">
+                    <table class="w3-striped w3-table-all w3-centered" style="width:100%">
+                        <tr v-for="index in sizeArr" :class="{'w3-green':index%3==0, 'w3-black':index%3==1, 'w3-teal':index%3==2}">
+                            <td v-for="el in table[index]" v-text="el" class="w3-margin"></td>
+                        </tr>
+                        <tr>
+                            <td v-for="hit in output.hit" class="w3-margin">
+                                <span v-if="hit">PF</span>
+                                <span v-else>PH</span>
+                            </td>
+                        </tr>
+
+                        <p class="w3-center w3-blue w3-padding-32 w3-margin">
+                            Page Faults: {{faults}}, Page Hits : {{hits}}
+                        </p>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#V",
+            data: {
+                algo: '',
+                inputs: [],
+                value: '',
+                size: '',
+                sizeArr: [],
+                max: Infinity,
+                output: {},
+                table: [],
+                show: false,
+                hits: 0,
+                faults: 0
+            },
+            methods: {
+                addIpts() {
+                    if (this.value != null && this.value != '' && this.value != undefined) {
+                        if (new Number(this.value) <= new Number(this.max) && new Number(this.value) >= 0) {
+                            this.inputs.push(parseInt(this.value));
+                            this.value = '';
+                        } else {
+                            alert(`Invalid Input ${this.value} . Make sure input in greater than 1 and lesser than ${this.max}`);
+                        }
+                    }
+                },
+                done() {
+                    for (var i = 0; i < this.inputs.length; i++)
+                        input.push(parseInt(this.inputs[i]));
+
+                    if (this.algo == "FIFO")
+                        this.output = FIFO(parseInt(this.size))
+                    else if (this.algo == "LRU")
+                        this.output = LRU(parseInt(this.size))
+                    else if (this.algo == "OPT")
+                        this.output = OPT(parseInt(this.size))
+                    else if (this.algo == "LFU")
+                        this.output = LFU(parseInt(this.size))
+                    else if (this.algo == "SC")
+                        this.output = SC(parseInt(this.size))
+
+                    for (var i = 0; i < this.size; i++) {
+                        this.table[i] = [];
+                        for (var j = 0; j < i && j < this.inputs.length; j++) {
+                            this.table[i].push("");
+                        }
+                        for (var j = i; j < this.inputs.length; j++) {
+                            this.table[i].push(this.output.output[j][i]);
+                        }
+                    }
+
+                    for (var i = 0; i < this.output.hit.length; i++)
+                        if (this.output.hit[i])
+                            this.faults++;
+                        else
+                            this.hits++
+
+                            this.show = true;
+                },
+                createArr() {
+                    this.size = parseInt(this.size);
+                    var x = this.size;
+                    if (x <= 0) {
+                        alert('Invalid size. Give frame size greater than 0.');
+                        this.size = "";
+                        return;
+                    }
+                    this.sizeArr = [];
+                    for (var i = 0; i < this.size; i++) {
+                        this.sizeArr.push(i);
+                    }
+                },
+                check() {
+                    this.max = parseInt(this.max);
+                    var x = this.max;
+                    if (x <= 0) {
+                        alert('Invalid Max Page Number. Give Max Page Number greater than 0.');
+                        this.max = "";
+                    }
+                }
+            },
+            computed: {
+                dis() {
+                    if (!this.algo || this.inputs.length)
+                        return true;
+                    else
+                        return false;
+                },
+                inpDis() {
+                    if (!this.algo || this.max === '')
+                        return true;
+                    else
+                        return false;
+                },
+                disSub() {
+                    if (!(parseInt(this.size)) || this.algo === '' || !this.inputs.length) {
+                        return true;
+                    } else
+                        return false;
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+/* Put your CSS here */
+
+body{
+  font-family: 'Open Sans', sans-serif;
+}
+
+.container
+{
+    margin:5% 15% 5% 15%;
+}
+.radio{
+  margin:10px;
+}
+
+#tail_track{
+  margin:2%;
+}
+#init_track{
+  margin:2%;
+}
+
+#run_sim-btn{
+  position: absolute;
+  left:2%;
+  margin: 1.8%;
+}
+
+
+/* #run_sim-btn{
+  position: relative;
+
+  right:50%;
+
+} */
+
+.h1{
+  margin-left:20px;
+}
+#simulator {
+    position: relative;
+}
+
+.input_segment {
+    width: 600px;
+    margin-bottom: 10px;
+}
+
+#queue-controls textarea{
+    width: 100%;
+}
+
+#queue-controls{
+  margin:4% 1% 5% 1%;
+}
+
+#controls {
+    border-style: solid;
+    border-width: 5px;
+    width: 100%;
+    border-radius: 25px;
+    padding: 15px;
+    height: 600px;
+}
+
+#algor-controls {
+    position: relative;
+    width: 600px;
+}
+
+#algor_choose {
+    position: relative;
+    width: 600px;
+    height: 185px;
+}
+
+#algor-radio {
+    position: absolute;
+    width: 300px;
+    top: 0;
+    left: 0;
+    margin: 2%;
+}
+
+#algor_desc {
+    position: absolute;
+    top: 0;
+    left: 70%;
+    width: 75%;
+    text-indent: 25px;
+    font-size: 18px;
+    padding: 3%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: green;
+    border-radius: 25px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+#options-controls {
+    position: relative;
+    width: 100%;
+    font-size: 15px;
+}
+
+/* #options-controls .form-control {
+    width: 30px;
+    height: 12px;
+} */
+
+#options-controls .option {
+    width: 200px;
+    float: left;
+}
+
+#queue_size {
+    visibility: hidden;
+}
+
+#results-controls {
+    position: absolute;
+    bottom: 100px;
+    visibility: hidden;
+    width: 100%;
+    border-style: solid;
+    border-width: 5px;
+    border-radius: 25px;
+    padding:5%;
+}
+
+#results-text {
+    resize: none;
+    /* height: 100px; */
+    width:100%;
+}
+
+#running_sim {
+    position: relative;
+}
+
+#output_stats {
+    float: left;
+    width: 250px;
+}
+
+#game {
+    /* float: right; */
+    height: 250px;
+    width: 250px;
+    margin-left:30%;
+
+}

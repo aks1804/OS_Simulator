@@ -1,0 +1,145 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* navbar */
+        
+        nav {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+        }
+        
+        .navbar-header {
+            display: flex;
+            flex-direction: row;
+        }
+        
+        .nav-pills>li>a {
+            /* adjust padding for height*/
+            padding: 30px 40px 30px 40px !important;
+        }
+        
+        .button {
+            border-radius: 8px;
+            background-color: #258ff1;
+            border: none;
+            color: #FFFFFF;
+            text-align: center;
+            font-size: 28px;
+            padding: 20px;
+            width: 200px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .button span {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            transition: 0.5s;
+        }
+        
+        .button span:after {
+            content: '\00bb';
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            right: -20px;
+            transition: 0.5s;
+        }
+        
+        .button:hover span {
+            padding-right: 25px;
+        }
+        
+        .button:hover span:after {
+            opacity: 1;
+            right: 0;
+        }
+        
+        .btn-row {
+            margin-top: 50px;
+            animation-name: FadeOut;
+            animation-duration: 5s;
+        }
+        
+        @keyframes FadeIn {
+            0% {
+                /* position: absolute; */
+                opacity: 0;
+            }
+            50% {
+                /* position: absolute; */
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        .heading {
+            font-size: 40px;
+            text-align: center;
+            margin-top: 80px;
+            opacity: 1;
+            animation-name: FadeIn;
+            animation-duration: 3s;
+            color: dodgerblue;
+        }
+        
+        .choose {
+            font-size: 30px;
+            text-align: center;
+            margin-top: 90px;
+            opacity: 1;
+            animation-name: FadeOut;
+            animation-duration: 5s;
+            color: rgb(133, 133, 133);
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <title>MVT</title>
+
+</head>
+
+<body style="background-color: #143D59;">
+    <!-- Nav Header -->
+    <nav class="navbar navbar-default navbar-fixed-top" style="background-color: #F4B41A;">
+        <div class="navbar-header ">
+
+            <a class="navbar-brand" href="../index.html" style="color: #143D59;">
+                <span style="color: #143D59;">OS</span> Simulator
+            </a>
+        </div>
+
+    </nav>
+
+    <p class="heading" style="color: #F4B41A;">Multiprogramming with variable number of tasks</p>
+
+
+    <div style="padding: 60px">
+        <div class="list-group" id="myList" role="tablist">
+            <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" style="background-color: #F4B41A;">
+                <div onclick="window.location.href='./mvt/ff/ff.html'"><b style="font-size: 24px">First Fit</b></div>
+            </a>
+            <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" style="background-color: #F4B41A;">
+                <div onclick="window.location.href='./mvt/bf/bf.html'"><b style="font-size: 24px">Best Fit</b></div>
+            </a>
+            <a class="list-group-item list-group-item-action" data-toggle="list" role="tab" style="background-color: #F4B41A;">
+                <div onclick="window.location.href='./mvt/wf/wf.html'"><b style="font-size: 24px">Worst Fit</b></div>
+            </a>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Process Scheduling
+    </title>
+
+    <link rel="stylesheet" href="../main.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../main.js"></script>
+</head>
+
+
+<body style="padding:10px;">
+
+    <nav class="navbar navbar-default navbar-fixed-top" style="background-color: white">
+        <div class="navbar-header ">
+
+            <a class="navbar-brand" href="../index.html" style="color: dodgerblue ">
+                <span style="color: dodgerblue">OS</span> Simulator
+            </a>
+        </div>
+
+    </nav>
+
+    <br>
+    <br>
+    <div class="container-fluid container2">
+        <div class="about">
+            <b>
+                <span style="color: dodgerblue">Process Scheduling</span> 
+            </b>
+
+        </div>
+        <div class="panel-body">
+
+            <div id="output">
+            </div>
+
+            <div class="card" style="height:70px;">
+                <div style="float:left;">
+                    <label for="sel1" style="float:left;">Select Algorithm to be used :</label>
+                    <br>
+                    <select class="form-control" id="sel1" style="width:400px;">
+            <option>First come first serve(FCFS)</option>
+            <option>Shortest job first Pre-emptive</option>
+            <option>Round-Robin(RR)</option>
+          </select>
+                </div>
+                <br><br>
+                <br>
+                <br>
+
+                <div style="width:250px;float:left;text-align:left;">
+                    Enter arrival time:
+                    <input style="width:200px;" id="newarrivaltime" class="form-control" type="text" value=""></input>
+                </div>
+                <div style="width:300px;float:left;text-align:left;">
+                    Enter burst time:
+                    <input style="width:200px;float:left;" id="newbursttime" class="form-control" type="text" value=""></input>
+                    <button class="btn btn-success" onclick="addToList()" style="float:left;margin-left:10px;">Add</button>
+                </div>
+            </div>
+            <div id="tq" style="text-align:left;"></div>
+            <br><br><br><br>
+            <div style="height:50px;">
+                <button style="float:left;" id="sender" onclick=send() class="btn btn-primary">Calculate</button>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="snackbar"></div>
+    <div class="text-center" style="padding-left:600px">
+        <div class="panel panel-warning" style="width:50%;float:center;">
+            <div class="panel-heading">
+                <h3>Table</h3>
+            </div>
+            <div class="panel-content">
+                <table id="ptab" class="table table-bordered">
+                    <thead>
+                        <tr id="thead">
+                            <th>PNO.</th>
+                            <th>Arrival time</th>
+                            <th>Burst time</th>
+                            <th>Completion time</th>
+                            <th>Waiting time</th>
+                            <th>Turn-around time</th>
+                        </tr>
+                        <tbody id="ptable">
+
+                        </tbody>
+
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <h1>
+        <p id="demo" class="text-center"></p>
+    </h1>
+</body>
+
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $('#sel1').change(function() {
+        if ($('#sel1').val() === "Round-Robin(RR)")
+            $('#tq').append('<br>Time quantum: <input style="width:200px; display:visible" id="mytq" class="form-control" type="text" value=""></input>');
+        else $('#tq').empty();
+    });
+
+    if ($('#sel1').val() === "Round-Robin(RR)")
+        $('#tq').append('<br>Time quantum: <input style="width:200px; display:visible" id="mytq" class="form-control" type="text" value=""></input>');
+    else $('#tq').empty();
+
+
+    $('#sender').click(function() {
+        var mytq = JSON.stringify(tq);
+        if ($('#sel1').val() === "Round-Robin(RR)") {
+            mytq = JSON.stringify(parseInt($('#mytq').val()));
+        }
+        var text = JSON.stringify(stuff);
+        var alg = JSON.stringify($("#sel1").val().split("(")[1].split(")")[0])
+            //console.log(text);
+        $.post('/process/gateway/', {
+            value: text,
+            algo: alg,
+            tq: mytq
+        }, function(result) {
+            sequence = result["gantt"];
+            a = result["table"]
+            avgwt = 0;
+            avgtat = 0;
+            for (i = 0; i < a.length; ++i) {
+                avgwt += a[i].wt;
+                avgtat += a[i].turn;
+            }
+            total = sequence.length;
+            pixel = 0;
+            i = 0;
+            $('#outer-div,#comments,#ptable,#gantth').empty();
+            // $('#thead').append('<th>PNO.</th> <th>Arrival time</th>  <th>Burst time</th>  <th>Completion time</th>  <th>Waiting time</th>  <th>Turn-around time</th>');
+            totalTime = sequence[total - 1].stop;
+            pixel = parseInt(800 / totalTime);
+            containerWidth = pixel * totalTime + 2;
+            $('#outer-div').css('width', containerWidth + 'px');
+            displayBlock(i);
+        });
+    });
+    var stuff = [];
+
+    function addToList() {
+        // body...
+
+        var a = parseFloat(document.getElementById("newarrivaltime").value);
+        var b = parseFloat(document.getElementById("newbursttime").value);
+
+        if (a < 0 || b < 0) {
+            toast("Invalid Input");
+        } else {
+            //arrivaltime.value="";
+            //bursttime.value="";
+            var arrivaltime = a;
+            var bursttime = b;
+            stuff.push({
+                "arrivaltime": arrivaltime,
+                "bursttime": bursttime
+            });
+            displayList();
+            document.getElementById("newarrivaltime").value = "";
+            document.getElementById("newbursttime").value = "";
+        }
+    }
+    var quantum = 0.0;
+
+    function send() {
+        var pro = [];
+        console.log(stuff);
+        for (var z = 0; z < stuff.length; z++) {
+
+            pro.push({
+                pid: z,
+                burst: stuff[z].bursttime,
+                arrival: stuff[z].arrivaltime,
+                wait: 0,
+                turn: 0,
+                complete: 0,
+                rt: stuff[z].bursttime
+            });
+
+        }
+        console.log(pro);
+
+        if ($('#sel1').val() === "Round-Robin(RR)") {
+            quantum = JSON.stringify(parseFloat($('#mytq').val()));
+            console.log(quantum);
+            if (quantum <= 0) {
+                toast("Invalid input");
+            } else {
+                pro = roundrobin(pro, quantum);
+                console.log(pro);
+            }
+        } else if ($('#sel1').val() === "First come first serve(FCFS)") {
+            pro = fcfs(pro);
+            console.log(pro);
+        } else if ($('#sel1').val() === "Shortest job first Pre-emptive") {
+            pro = sjf_preempt(pro);
+            console.log(pro);
+        }
+
+        for (z = 0; z < stuff.length; z++) {
+            document.getElementById("ptable").innerHTML += "  <tr>\
+              <td>" + (pro[z].pid + 1) + "</th>\
+              <td>" + pro[z].arrival + "</th>\
+              <td>" + pro[z].burst + "</th>\
+              <td>" + (pro[z].turn + pro[z].arrival) + "</th>\
+              <td>" + pro[z].wait + "</th>\
+              <td>" + pro[z].turn + "</th>\
+              </tr>\
+              ";
+        }
+
+    }
+
+    var avgWait_fcfs = 0.0,
+        avgTurn_fcfs = 0.0;
+
+    function fcfs(processes) {
+        $('#ptable').empty();
+        console.log("FCFS");
+        //Sort on arrival time
+        processes.sort(cmp_fcfs);
+        console.log(processes); //Check if sorted
+        var n = processes.length;
+        processes[0].turn = processes[0].burst;
+        avgTurn_fcfs += processes[0].turn;
+        avgWait_fcfs = 0.0;
+
+        for (var i = 1; i < n; ++i) {
+            processes[i].wait = processes[i - 1].turn + processes[i - 1].arrival - processes[i].arrival;
+            if (processes[i].wait < 0) {
+                processes[i].wait = 0;
+                processes[i].turn = processes[i].burst;
+            } else
+                processes[i].turn = processes[i - 1].turn + processes[i].burst + processes[i - 1].arrival - processes[i].arrival;
+
+            avgWait_fcfs += processes[i].wait;
+            avgTurn_fcfs += processes[i].turn;
+        }
+        avgWait_fcfs /= n;
+        avgTurn_fcfs /= n;
+        //Check by printing
+        console.log(processes);
+        console.log(avgWait_fcfs);
+
+        document.getElementById("demo").innerHTML = "Average Waiting Time is " + avgWait_fcfs + "<br>Average Turn Around Time is " + avgTurn_fcfs
+        return processes;
+    }
+
+    function cmp_fcfs(a, b) {
+        if (a.arrival < b.arrival)
+            return -1;
+        else
+            return 1;
+    }
+
+    var queue = [];
+    var rear, front;
+    rear = -1;
+    front = -1;
+
+    function enqueue(i) //function to enqueue the processes waiting
+    {
+        rear += 1;
+        queue[rear] = i;
+        if (front == -1)
+            front = 0;
+    }
+
+    function dequeue() //function to dequeue the processes from queue
+    {
+        let temp = queue[front];
+        if (front == rear)
+            front = -1, rear = -1;
+        else
+            front += 1;
+        return temp;
+    }
+
+    function InQueue(i) // checking whether a process is in queue
+    {
+        let j;
+        for (j = front; j <= rear; j++) {
+            if (queue[j] == i)
+                return 1;
+        }
+        return 0;
+    }
+
+    function sortbyArrival(process) //sorting the processes by arrival time
+    {
+        let temp_pro, n = process.length;
+        let i, j;
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < n - i - 1; j++) {
+                if (process[j].arrival > process[j + 1].arrival) {
+                    temp_pro = process[j];
+                    process[j] = process[j + 1];
+                    process[j + 1] = temp_pro;
+                }
+            }
+        }
+    }
+
+    function roundrobin(process, quantum) {
+        $('#ptable').empty();
+        console.log(process);
+        let time = 0;
+        let n = process.length;
+        let avgWait_rr = 0.0,
+            avgTurn_rr = 0.0;
+        let count = n;
+        let cur = 0;
+        let i, j;
+        quantum = parseInt(quantum, 10);
+        sortbyArrival(process);
+        enqueue(0); //enqueueing the first process
+        for (time = process[0].arrival; count > 0;) {
+            if (count > 0 && front == -1) {
+                time++;
+                for (j = 0; j < n; j++) {
+                    if (process[j].arrival <= time && process[j].complete != 1 && InQueue(j) != 1) //checking whether a process is already in queue and whether it is completed or not.
+                        enqueue(j);
+                }
+            } else {
+                i = dequeue();
+                if (process[i].rt <= quantum) {
+                    time += process[i].rt;
+                    process[i].rt = 0;
+                    process[i].complete = 1;
+                    count--;
+                    process[i].wait = time - process[i].arrival - process[i].burst;
+                    avgWait_rr += process[i].wait;
+                    process[i].turn = time - process[i].arrival;
+                    avgTurn_rr += process[i].turn;
+                    console.log("The waiting time of the process is" + process[i].wait);
+                    console.log("The turnaound time of the process is" + process[i].turn);
+                    for (j = 0; j < n; j++) {
+                        if (process[j].arrival <= time && process[j].complete != 1 && InQueue(j) != 1)
+                            enqueue(j);
+                    }
+                } else {
+                    time += quantum;
+                    process[i].rt -= quantum;
+                    cur = i;
+                    for (j = 0; j < n; j++) {
+                        if (process[j].arrival <= time && process[j].complete != 1 && InQueue(j) != 1 && j != i)
+                            enqueue(j);
+                    }
+                    enqueue(i);
+                }
+            }
+        }
+        avgTurn_rr = avgTurn_rr / n;
+        avgWait_rr = avgWait_rr / n;
+        console.log("The avg. waiting time is " + avgWait_rr); //printing the avg. waiting time of all the processes.
+        console.log("The avg. turnaroundtime time is " + avgTurn_rr); //printing the avg. turnaround time of all the processes.
+        document.getElementById("demo").innerHTML = "Average Waiting Time is " + avgWait_rr + "<br>Average Turn Around Time is " +   avgTurn_rr
+        return process;
+    }
+
+    function edit(id) {
+        var pos = parseInt(id.substr(3));
+        var button = document.getElementById(id);
+        button.innerHTML = "SAVE";
+        button.setAttribute("onclick", "save(" + pos + ")");
+        document.getElementById("arrivaltime" + pos).removeAttribute("disabled");
+        document.getElementById("bursttime" + pos).removeAttribute("disabled");
+    }
+
+    var timer = 0,
+        avgWait_sjf = 0.0,
+        avgTurn_sjf = 0.0;
+
+    function get_min(process) {
+        let n = process.length;
+        let i = 0;
+        let min = 999,
+            min_index = 0;
+        for (i = 0; i < n; i++) {
+            if (process[i].arrival > timer || process[i].burst == 0)
+                continue;
+            if (process[i].burst < min) {
+                min = process[i].burst;
+                min_index = i;
+
+            }
+        }
+
+        return min_index;
+    }
+
+    function sjf_preempt(process) {
+        $('#ptable').empty();
+        let not_finished = 1;
+        let n = process.length,
+            flag_sum = 0;
+        let dup = [],
+            i = 0,
+            j = 0;
+        for (i = 0; i < n; i++) {
+            dup.push(process[i].burst);
+            process[i].wait = 0;
+            process[i].turn = 0;
+        }
+
+        //running a loop for every second of timer
+        while (not_finished) {
+
+            flag_sum = 0;
+            //get process with shortest burst time
+            min = get_min(process);
+
+            process[min].burst -= 1;
+
+            for (j = 0; j < n; j++) {
+                if (j != min && process[j].burst != 0 && process[j].arrival <= timer)
+                    process[j].wait += 1;
+                flag_sum += process[j].burst;
+            }
+            timer += 1;
+
+            //checking for finishing condition
+            if (flag_sum == 0)
+                not_finished = 0;
+
+        }
+
+        for (i = 0; i < n; i++) {
+            console.log("Waiting time of P (" + (i + 1) + ") is : " + process[i].wait);
+            process[i].turn = process[i].wait + dup[i];
+            console.log("Turnaround time time of P(" + (i + 1) + ") is : " + process[i].turn);
+            avgWait_sjf += process[i].wait;
+            avgTurn_sjf += process[i].turn;
+        }
+
+        avgWait_sjf /= n;
+        avgTurn_sjf /= n;
+
+        console.log("The avg. waiting time is " + avgWait_sjf);
+        console.log("The avg. turnaround time is " + avgTurn_sjf);
+        document.getElementById("demo").innerHTML = "Average Waiting Time is " + avgWait_sjf + "<br>Average Turn Around Time is " +   avgTurn_sjf
+        return process;
+
+    }
+
+    function save(pos) {
+        stuff[pos].arrivaltime = document.getElementById("arrivaltime" + pos).value;
+        stuff[pos].bursttime = document.getElementById("bursttime" + pos).value;
+        displayList();
+    }
+
+    function displayList() {
+        var output = document.getElementById("output");
+        //Clear the op
+        output.innerHTML = '';
+        for (var i = 0; i < stuff.length; i++) {
+            var card = document.createElement("div");
+            card.setAttribute("class", "card");
+            var input1 = document.createElement("input");
+            input1.value = stuff[i].arrivaltime;
+            input1.setAttribute("disabled", "disabled");
+            input1.setAttribute("id", "arrivaltime" + i);
+            var input2 = document.createElement("input");
+            input2.value = stuff[i].bursttime;
+            input2.setAttribute("disabled", "disabled");
+            input2.setAttribute("id", "bursttime" + i);
+            var btn = document.createElement("button");
+            var textNode = document.createTextNode("EDIT");
+            btn.appendChild(textNode);
+            btn.setAttribute("id", "btn" + i);
+            btn.setAttribute("onclick", "edit(this.id)");
+            card.appendChild(input1);
+            card.appendChild(input2);
+            card.appendChild(btn);
+            output.appendChild(card);
+        }
+    }
+</script>
